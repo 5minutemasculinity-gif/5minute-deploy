@@ -6,12 +6,19 @@ workflows:
       groups:
         - appstore_credentials
       vars:
-        IPA_URL: "https://gonativeio-apps.s3.us-east-1.amazonaws.com/static/693cbb86fff92e2df9669c4f/App.ipa"
+        IPA_URL: "https://github.com/5minutemasculinity-gif/5minute-deploy/releases/download/v1.0/App.8.ipa"
     scripts:
-      - name: Download IPA from Median
+      - name: Download IPA
         script: |
+          echo "Downloading IPA from GitHub..."
           curl -L "$IPA_URL" -o /tmp/app.ipa
-          echo "IPA downloaded:"
+          FILE_SIZE=$(stat -f%z /tmp/app.ipa 2>/dev/null || stat -c%s /tmp/app.ipa)
+          echo "Downloaded: $FILE_SIZE bytes"
+          if [ "$FILE_SIZE" -lt 100000 ]; then
+            echo "ERROR: File too small. Download failed."
+            cat /tmp/app.ipa
+            exit 1
+          fi
           ls -lh /tmp/app.ipa
     artifacts:
       - /tmp/app.ipa

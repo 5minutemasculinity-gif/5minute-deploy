@@ -1,0 +1,23 @@
+workflows:
+  upload-to-app-store:
+    name: Upload IPA to App Store Connect
+    instance_type: mac_mini_m2
+    environment:
+      groups:
+        - appstore_credentials
+      vars:
+        IPA_URL: "https://gonativeio-apps.s3.us-east-1.amazonaws.com/static/693cbb86fff92e2df9669c4f/App.ipa"
+    scripts:
+      - name: Download IPA from Median
+        script: |
+          curl -L "$IPA_URL" -o /tmp/app.ipa
+          echo "IPA downloaded:"
+          ls -lh /tmp/app.ipa
+    artifacts:
+      - /tmp/app.ipa
+    publishing:
+      app_store_connect:
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        submit_to_app_store: false
